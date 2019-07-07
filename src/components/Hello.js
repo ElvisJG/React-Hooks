@@ -1,13 +1,24 @@
-import React from 'react';
+import React, { useRef, useEffect, useState } from 'react';
+import { useFetch } from './useFetch';
 
 export const Hello = () => {
-  React.useEffect(() => {
-    console.log('render');
+  const renders = useRef(0);
+  const [count, setCount] = useState(() =>
+    JSON.parse(localStorage.getItem('count'))
+  );
+  const { data, loading } = useFetch(`http://numbersapi.com/${count}/trivia`);
+  // http://numbersapi.com/43/trivia
+  useEffect(() => {
+    localStorage.setItem('count', JSON.stringify(count));
+  }, [count]);
 
-    return () => {
-      console.log('unmount');
-    };
-  }, []);
+  console.log('hello renders: ', renders.current++);
 
-  return <div>Hello</div>;
+  return (
+    <div>
+      <div>{!data ? 'loading...' : data}</div>
+      <div>Count: {count}</div>
+      <button onClick={() => setCount(c => c++)}>Increment</button>
+    </div>
+  );
 };
